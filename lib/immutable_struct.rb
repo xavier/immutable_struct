@@ -26,12 +26,13 @@ private
 
       def initialize(*attrs)
         if members.size > 1 && attrs && attrs.size == 1 && attrs.first.instance_of?(Hash)
-          struct_initialize(*members.map { |m| attrs.first[m.to_sym] })
+          hash = attrs.first
+          struct_initialize(*members.map { |m| hash[m] || hash[m.to_s] })
         else
           struct_initialize(*attrs)
         end
       end
-      
+
       def to_h
         members.inject({}) do |h, m|
           h[m.to_sym] = self[m]

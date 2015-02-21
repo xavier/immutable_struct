@@ -41,9 +41,9 @@ describe ImmutableStruct do
     obj.a.should == 1
     obj.b.should == nil
   end
-  
+
   it 'creates a constructor that takes a hash' do
-    obj = ImmutableItem.new(:a => 1, :b => 2)
+    obj = ImmutableItem.new(:a => 1, "b" => 2)
     obj.a.should == 1
     obj.b.should == 2
     obj = ImmutableItem.new(:b => 2)
