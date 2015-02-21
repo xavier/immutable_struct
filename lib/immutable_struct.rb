@@ -2,7 +2,7 @@
 
 class ImmutableStruct
   VERSION = '1.1.1'
-  
+
   def self.new(*attrs, &block)
     struct = Struct.new(*attrs, &block)
     make_immutable!(struct)
@@ -10,7 +10,7 @@ class ImmutableStruct
     extend_dup!(struct)
     struct
   end
-  
+
 private
 
   def self.make_immutable!(struct)
@@ -19,10 +19,14 @@ private
       struct.send(:undef_method, "#{member}=".to_sym)
     end
   end
-  
+
   def self.optionalize_constructor!(struct)
     struct.class_eval do
       alias_method :struct_initialize, :initialize
+
+      def self.json_create(object)
+        new(object["members"])
+      end
 
       def initialize(*attrs)
         if members.size > 1 && attrs && attrs.size == 1 && attrs.first.instance_of?(Hash)
@@ -50,9 +54,22 @@ private
         struct_initialize(*members.map { |m| coder.map[m.to_s] })
       end
 
+      def as_json
+        klass = self.class.name
+        klass.to_s.empty? and raise JSON::JSONError, "Only named structs are supported!"
+        {
+          JSON.create_id => klass,
+          "members"      => to_h,
+        }
+      end
+
+      def to_json(*args)
+        as_json.to_json(*args)
+      end
+
     end
   end
-  
+
   def self.extend_dup!(struct)
     struct.class_eval do
       def dup(overrides={})
