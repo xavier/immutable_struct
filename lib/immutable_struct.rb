@@ -29,7 +29,7 @@ private
       end
 
       def initialize(*attrs)
-        if members.size > 1 && attrs && attrs.size == 1 && attrs.first.instance_of?(Hash)
+        if members.size > 1 && attrs && attrs.size == 1 && attrs.first.is_a?(Hash)
           hash = attrs.first
           struct_initialize(*members.map { |m| hash[m] || hash[m.to_s] })
         else
